@@ -14,8 +14,7 @@ jobs:
     timeout-minutes: 180
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Free disk space
         run: |
@@ -39,13 +38,13 @@ jobs:
 
       - name: Build NexOS ISO
         run: |
-          sudo WORK=/tmp/nexos-build OUT=$GITHUB_WORKSPACE CI=true \
-            bash build/build.sh
+          export CI=true
+          export WORK=/tmp/nexos-build
+          export OUT=$GITHUB_WORKSPACE
+          sudo -E bash build/build.sh
 
       - name: Show ISO info
-        run: |
-          ls -lh nexos.iso
-          echo "MD5: $(md5sum nexos.iso | cut -d' ' -f1)"
+        run: ls -lh nexos.iso && md5sum nexos.iso
 
       - name: Upload to GitHub Release
         env:
@@ -55,12 +54,4 @@ jobs:
           gh release create "$TAG" nexos.iso \
             --title "NexOS $TAG" \
             --notes "## NexOS Gaming Linux ISO
-
-          **How to use:**
-          1. Download \`nexos.iso\`
-          2. VirtualBox → New VM → Linux 64-bit, 4GB RAM, 50GB disk, 128MB video
-          3. Mount \`nexos.iso\` in the optical drive
-          4. Boot → login as \`nexos\` / \`nexos\`
-          5. Setup wizard opens automatically
-
-          **Includes:** KDE Plasma 6 · Neon dark theme · Animated login screen · Steam · Lutris · Wine · GameMode · MangoHud"
+          Download nexos.iso, mount in VirtualBox (Linux 64-bit, 4GB RAM, 50GB disk), boot, login nexos/nexos."

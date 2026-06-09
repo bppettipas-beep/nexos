@@ -26,7 +26,7 @@ error() { echo -e "${RED}[✗]${NC} $1"; exit 1; }
 [[ $EUID -ne 0 ]] && error "Must run as root: sudo bash build/build.sh"
 
 print_banner() {
-    clear
+    [[ -t 1 ]] && clear || true
     echo -e "${PURPLE}"
     cat << 'EOF'
   ███╗   ██╗███████╗██╗  ██╗ ██████╗ ███████╗
@@ -362,7 +362,7 @@ main() {
 
     export ISO_DIR
 
-    install_build_deps
+    [[ "${CI:-}" != "true" ]] && install_build_deps
     do_debootstrap
     bind_mounts
     copy_project_files
