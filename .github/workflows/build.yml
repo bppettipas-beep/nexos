@@ -42,7 +42,7 @@ jobs:
                         /nexos/iso/.disk /nexos/iso/EFI/boot
           sudo debootstrap \
             --arch=amd64 \
-            --include=apt-transport-https,ca-certificates,curl,gnupg \
+            --include=ca-certificates,curl,gnupg \
             noble /nexos/chroot http://archive.ubuntu.com/ubuntu/
 
       - name: Copy NexOS files into chroot
