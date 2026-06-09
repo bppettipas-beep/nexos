@@ -20,7 +20,7 @@ apt-get install -yq \
   kde-plasma-desktop sddm sddm-theme-breeze \
   plasma-workspace plasma-nm plasma-pa \
   dolphin konsole kate ark okular gwenview \
-  plasma-systemmonitor ksysguard \
+  plasma-systemmonitor \
   pipewire pipewire-pulse wireplumber \
   xdg-desktop-portal-kde
 
