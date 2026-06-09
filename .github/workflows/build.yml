@@ -59,7 +59,8 @@ jobs:
             sudo mkdir -p /nexos/chroot/$mp
             sudo mount --bind /$mp /nexos/chroot/$mp
           done
-          sudo cp /etc/resolv.conf /nexos/chroot/etc/resolv.conf
+          sudo rm -f /nexos/chroot/etc/resolv.conf
+          echo "nameserver 8.8.8.8" | sudo tee /nexos/chroot/etc/resolv.conf > /dev/null
 
       - name: Run chroot setup (installs KDE + gaming tools)
         run: sudo chroot /nexos/chroot bash /tmp/chroot-setup.sh
