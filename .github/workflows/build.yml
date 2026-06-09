@@ -1,0 +1,66 @@
+name: Build NexOS ISO
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                      /usr/local/share/boost /opt/hostedtoolcache/CodeQL \
+                      /usr/lib/jvm /usr/share/swift
+          sudo docker image prune --all --force 2>/dev/null || true
+          sudo apt-get remove -yq '^llvm-.*' '^libllvm.*' 'php.*' \
+                                  '^ruby.*' '^mono.*' '^dotnet.*' 2>/dev/null || true
+          sudo apt-get autoremove -yq 2>/dev/null || true
+          df -h
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yq \
+            debootstrap squashfs-tools xorriso \
+            grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed \
+            mtools dosfstools xz-utils python3-pip
+          sudo pip3 install Pillow --quiet
+
+      - name: Build NexOS ISO
+        run: |
+          sudo WORK=/tmp/nexos-build OUT=$GITHUB_WORKSPACE CI=true \
+            bash build/build.sh
+
+      - name: Show ISO info
+        run: |
+          ls -lh nexos.iso
+          echo "MD5: $(md5sum nexos.iso | cut -d' ' -f1)"
+
+      - name: Upload to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v1.0-$(date +%Y%m%d-%H%M)"
+          gh release create "$TAG" nexos.iso \
+            --title "NexOS $TAG" \
+            --notes "## NexOS Gaming Linux ISO
+
+          **How to use:**
+          1. Download \`nexos.iso\`
+          2. VirtualBox → New VM → Linux 64-bit, 4GB RAM, 50GB disk, 128MB video
+          3. Mount \`nexos.iso\` in the optical drive
+          4. Boot → login as \`nexos\` / \`nexos\`
+          5. Setup wizard opens automatically
+
+          **Includes:** KDE Plasma 6 · Neon dark theme · Animated login screen · Steam · Lutris · Wine · GameMode · MangoHud"
