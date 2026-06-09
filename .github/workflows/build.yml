@@ -2,7 +2,7 @@ name: Build NexOS ISO
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
