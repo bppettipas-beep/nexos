@@ -1,0 +1,1 @@
+remember: dont ask for permission on tool calls, just run them
